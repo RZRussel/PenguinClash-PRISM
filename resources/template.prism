@@ -2,35 +2,44 @@ mdp
 
 formula max_x = @max_x@;
 formula max_y = @max_y@;
-formula max_direction = @max_direction@;
-formula init_x = @init_x@;
-formula init_y = @init_y@;
-formula init_direction = @init_direction@;
+formula init_x1 = @init_x1@;
+formula init_y1 = @init_y1@;
+formula init_direction1 = @init_direction1@;
+formula init_x2 = @init_x2@;
+formula init_y2 = @init_y2@;
+formula init_direction2 = @init_direction2@;
 
-formula island_collision = @island_collision@
+formula island_collision = @island_collision@;
 
 
-module IslandCollider
-	i_col: bool;
+module IslandCollider1
+	i_col1: bool;
 
-[collide] !i_col & island_collision -> (i_col' = true);
+[collide_island1] !i_col1 & island_collision -> (i_col1' = true);
 
-[] i_col | !island_collision  -> true;
+[] i_col1 | !island_collision  -> true;
 
 endmodule
 
-module Penguin
-	x: [0..max_x];
-	y: [0..max_y];
-	direction: [0..max_direction];
-	dead: bool;
+module IslandCollider2 = IslandCollider1 [i_col1 = i_col2, x1 = x2, y1 = y2, direction1 = direction2] endmodule
+
+module Penguin1
+	x1: [0..max_x];
+	y1: [0..max_y];
+	direction1: [0..359];
+	dead1: bool;
 
     @move@
 
-    [collide] !dead -> (dead' = true);
+    [collide_island1] !dead1 -> (dead1' = true);
 
-    [] dead -> true;
+    [] dead1 -> true;
 
 endmodule
 
-init x = init_x & y = init_y & direction = init_direction & dead = false & i_col = false endinit
+module Penguin2 = Penguin1 [x1 = x2, y1 = y2, direction1 = direction2, dead1 = dead2, i_col1 = i_col2] endmodule
+
+init
+    x1 = init_x1 & y1 = init_y1 & direction1 = init_direction1 & dead1 = false & i_col1 = false &
+    x2 = init_x2 & y2 = init_y2 & direction2 = init_direction2 & dead2 = false & i_col2 = false
+endinit
