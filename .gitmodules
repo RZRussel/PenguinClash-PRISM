@@ -1,0 +1,3 @@
+[submodule "ABSGenerator"]
+	path = ABSGenerator
+	url = git-inno:RZRussel/ABSGenerator.git

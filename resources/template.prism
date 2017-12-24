@@ -1,0 +1,36 @@
+mdp
+
+formula max_x = @max_x@;
+formula max_y = @max_y@;
+formula max_direction = @max_direction@;
+formula init_x = @init_x@;
+formula init_y = @init_y@;
+formula init_direction = @init_direction@;
+
+formula island_collision = @island_collision@
+
+
+module IslandCollider
+	i_col: bool;
+
+[collide] !i_col & island_collision -> (i_col' = true);
+
+[] i_col | !island_collision  -> true;
+
+endmodule
+
+module Penguin
+	x: [0..max_x];
+	y: [0..max_y];
+	direction: [0..max_direction];
+	dead: bool;
+
+    @move@
+
+    [collide] !dead -> (dead' = true);
+
+    [] dead -> true;
+
+endmodule
+
+init x = init_x & y = init_y & direction = init_direction & dead = false & i_col = false endinit
