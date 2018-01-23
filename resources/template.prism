@@ -11,13 +11,20 @@ formula init_direction2 = @init_direction2@;
 
 formula island_collision = @island_collision@;
 
+module Schedule
+    lock: bool;
+
+    [step] !lock -> (lock' = true);
+    [step] lock -> (lock' = false);
+
+endmodule
 
 module IslandCollider1
 	i_col1: bool;
 
-[collide_island1] !i_col1 & island_collision -> (i_col1' = true);
-
-[] i_col1 | !island_collision  -> true;
+    [step] lock & (!i_col1 & island_collision) -> (i_col1' = true);
+    [step] lock & (i_col1 | !island_collision)  -> true;
+    [step] !lock -> true;
 
 endmodule
 
@@ -31,15 +38,19 @@ module Penguin1
 
     @move@
 
-    [collide_island1] !dead1 -> (dead1' = true);
+    [step] !lock & i_col1 -> (dead1' = true);
+    [step] !lock & dead1 -> true;
 
-    [] dead1 -> true;
+    [step] lock -> true;
 
 endmodule
 
-module Penguin2 = Penguin1 [x1 = x2, y1 = y2, direction1 = direction2, dead1 = dead2, i_col1 = i_col2] endmodule
+module Penguin2 = Penguin1
+    [x1 = x2, y1 = y2, direction1 = direction2, dead1 = dead2, i_col1 = i_col2]
+endmodule
 
 init
     x1 = init_x1 & y1 = init_y1 & direction1 = init_direction1 & dead1 = false & i_col1 = false &
-    x2 = init_x2 & y2 = init_y2 & direction2 = init_direction2 & dead2 = false & i_col2 = false
+    x2 = init_x2 & y2 = init_y2 & direction2 = init_direction2 & dead2 = false & i_col2 = false &
+    lock = false
 endinit

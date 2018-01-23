@@ -15,9 +15,12 @@ K_PENGUIN_Y = "y1"
 K_PENGUIN_DIRECTION = "direction1"
 K_PENGUIN_DEAD = "dead1"
 
+K_SCHEDULER_LOCK = "lock"
+
 K_PENGUIN_ACTION_MOVE = "move"
 K_OPERATOR_ISLAND_COLLISION = "island_collision"
 
+K_COMMAND_LABEL = "step"
 
 class PGGenerator:
     def __init__(self, settings: Dict):
@@ -26,9 +29,14 @@ class PGGenerator:
     @staticmethod
     def _precondition(action: str) -> Any:
         if action == K_PENGUIN_ACTION_MOVE:
-            precondition = ExpressionBuilder(Identifier(K_PENGUIN_DEAD))
-            precondition.append_not()
-            return precondition.expression
+            lock = ExpressionBuilder(Identifier(K_SCHEDULER_LOCK))
+            lock.append_not()
+
+            dead = ExpressionBuilder(Identifier(K_PENGUIN_DEAD))
+            dead.append_not()
+
+            lock.append_and(dead.expression)
+            return lock.expression
         return None
 
     def max_x(self) -> str:
@@ -60,7 +68,7 @@ class PGGenerator:
         compacted_list = compact_list_by_index(move_offsets)
 
         precondition = self._precondition(K_PENGUIN_ACTION_MOVE)
-        guard_builder = GuardBuilder(K_PENGUIN_ACTION_MOVE)
+        guard_builder = GuardBuilder(K_COMMAND_LABEL)
 
         for (x, y), direction in compacted_list:
             x_cond_builder = ExpressionBuilder(Identifier(K_PENGUIN_X))
