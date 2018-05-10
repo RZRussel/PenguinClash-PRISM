@@ -1,4 +1,4 @@
-i#!/bin/sh
+#!/bin/sh
 
 echo "Building model..."
 python ABSGenerator/modelgen.py -t resources/template.prism -s resources/settings.yaml -g PGGenerator.py -o resources/model.prism
